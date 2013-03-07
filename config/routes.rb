@@ -57,5 +57,6 @@ Doctor::Application.routes.draw do
   # match ':controller(/:action(/:id))(.:format)'
 
   match 'documents/view' => 'documents#view'
+  match 'documents/convert' => 'documents#convert'
 
 end
