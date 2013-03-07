@@ -1,4 +1,5 @@
 require 'net/https'
+require 'docsplit'
 
 class DocumentsController < ApplicationController
 
@@ -45,8 +46,8 @@ class DocumentsController < ApplicationController
 
     # TODO: detect whether conversion is needed/possible (filter MIME types?)
 
-    # TODO: abstract this out to keep things decoupled
-    %x( /Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to pdf --outdir #{Rails.root}/tmp #{Rails.root}/tmp/#{temp_filename} )
+    # Use Docsplit to create the PDF version of the source file
+    Docsplit.extract_pdf("#{Rails.root}/tmp/#{temp_filename}", :output => "#{Rails.root}/tmp")
 
     # TODO: do we need to enable CORS?
     #response.headers["Access-Control-Allow-Origin"] = "http://localhost"

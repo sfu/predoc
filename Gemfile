@@ -36,3 +36,9 @@ gem 'jquery-rails'
 
 # To use debugger
 # gem 'debugger'
+
+# ---
+
+# Docsplit for converting documents into PDFs
+gem "docsplit", "~> 0.7.2"
+
