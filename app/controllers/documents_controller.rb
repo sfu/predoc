@@ -39,7 +39,13 @@ class DocumentsController < ApplicationController
     @source = params[:source]
 
     # read the source file to be converted
-    response = fetch(@source, 10)
+    begin
+      response = fetch(@source, 10)
+    rescue
+      # error occurred; render the error page instead
+      render :error
+      return
+    end
 
     # save a copy of the source file
     File.open("#{Rails.root}/tmp/#{temp_filename}", 'wb') do |f|
@@ -48,7 +54,7 @@ class DocumentsController < ApplicationController
 
     # TODO: detect whether conversion is needed/possible (filter MIME types?)
 
-    # Use Docsplit to create the PDF version of the source file
+    # use Docsplit to create the PDF version of the source file
     Docsplit.extract_pdf("#{Rails.root}/tmp/#{temp_filename}", :output => "#{Rails.root}/tmp")
 
     # TODO: do we need to enable CORS?
