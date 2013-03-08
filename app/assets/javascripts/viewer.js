@@ -11,8 +11,8 @@
             .attr('height', '100%')
             .attr('seamless', 'seamless')
             .bind('load', function () {
-                // hide the loading indicator when the document is loaded
-                $('#loading-indicator').hide();
+                // hide the messages when the document is loaded
+                $('#viewer-messages').hide();
             })
             .appendTo('body');
 

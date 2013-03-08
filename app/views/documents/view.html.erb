@@ -1,7 +1,9 @@
 <% content_for :head do %>
-    <%= stylesheet_link_tag "chromeless" %>
-    <%= stylesheet_link_tag "viewer" %>
-    <%= javascript_include_tag "viewer" %>
+  <%= stylesheet_link_tag "chromeless" %>
+  <%= stylesheet_link_tag "viewer" %>
+  <%= javascript_include_tag "viewer" %>
 <% end %>
 
-<div id="loading-indicator" data-viewer-source="<%= @source %>">Loading document preview. One moment please...</div>
+<div id="viewer-messages">
+  <div id="loading-indicator" data-viewer-source="<%= @source %>">Loading document preview. One moment please...</div>
+</div>
