@@ -4,8 +4,10 @@ require 'docsplit'
 class DocumentsController < ApplicationController
 
   def view
-    # viewer chrome (for things like progress bar and page controls, etc.)
-    # TODO: work in progress...
+    # TODO: add page controls, and maybe pdf.js?
+
+    # get the source file URL
+    @source = params[:source]
   end
 
   def fetch(uri_string, limit = 10)

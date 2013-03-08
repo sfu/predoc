@@ -1,0 +1,7 @@
+html, body
+{
+    /* enable full-page layout from edge to edge */
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
