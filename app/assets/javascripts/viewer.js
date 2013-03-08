@@ -11,9 +11,11 @@
             .attr('height', '100%')
             .attr('seamless', 'seamless')
             .bind('load', function () {
-                // hide the messages when the document is loaded
+                // show document when loaded, and hide the loading messages
+                $(this).show();
                 $('#viewer-messages').hide();
             })
+            .hide()
             .appendTo('body');
 
     });
