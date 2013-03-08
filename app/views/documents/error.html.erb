@@ -4,6 +4,6 @@
 <% end %>
 
 <div id="viewer-messages">
-  <p>We cannot create the document preview at this time.</p>
-  <p><%= link_to "Download the document", @source %></p>
+  <p title="The error was: <%= error %>">We cannot create the document preview at this time.</p>
+  <p><%= link_to "Download the document", source %></p>
 </div>

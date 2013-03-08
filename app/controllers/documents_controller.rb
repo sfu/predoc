@@ -41,9 +41,9 @@ class DocumentsController < ApplicationController
     # read the source file to be converted
     begin
       response = fetch(@source, 10)
-    rescue
+    rescue Exception => e
       # error occurred; render the error page instead
-      render :error
+      render :action => :error, :locals => { :error => e.to_s, :source => @source }
       return
     end
 
