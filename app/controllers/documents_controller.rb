@@ -65,25 +65,35 @@ class DocumentsController < ApplicationController
     storage_directory = get_storage_directory
     file_name = generate_hash response.body
     file_path = "#{storage_directory}/#{file_name}"
+    converted_file_path = "#{file_path}.pdf"
 
-    # save a temporary copy of the source file
-    File.open(file_path, 'wb') do |f|
-      f.write response.body
+    # TODO: (security considerations) if there is ever a collision in the hash,
+    # someone will see the preview of a different (potentially someone else's) file
+
+    # Convert the source file unless a cached conversion already exists.
+    #
+    # NOTE: A source document is deemed to have a cached copy if there is a converted document
+    # whose filename matches the hash of its contents.
+    unless FileTest::exists?(converted_file_path)
+      # save a temporary copy of the source file
+      File.open(file_path, 'wb') do |f|
+        f.write response.body
+      end
+
+      # TODO: detect whether conversion is needed/possible (filter MIME types?)
+
+      # use Docsplit to create the PDF version of the source file
+      Docsplit.extract_pdf(file_path, :output => storage_directory)
+
+      # delete the temporary source file
+      File::delete(file_path)
     end
-
-    # TODO: detect whether conversion is needed/possible (filter MIME types?)
-
-    # use Docsplit to create the PDF version of the source file
-    Docsplit.extract_pdf(file_path, :output => storage_directory)
-
-    # delete the temporary source file
-    File::delete(file_path)
 
     # TODO: do we need to enable CORS?
     #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
 
     # output the converted file
-    send_file "#{file_path}.pdf", :type => 'application/pdf', :disposition => 'inline'
+    send_file converted_file_path, :type => 'application/pdf', :disposition => 'inline'
   end
 
 end
