@@ -1,5 +1,6 @@
 require 'net/https'
 require 'docsplit'
+require 'digest/sha1'
 
 class DocumentsController < ApplicationController
 
@@ -8,6 +9,21 @@ class DocumentsController < ApplicationController
 
     # get the source file URL
     @source = params[:source]
+  end
+
+  def get_storage_directory
+    storage_directory = "#{Rails.root}/tmp/doctor"
+
+    # create storage directory unless already exists
+    unless FileTest::directory?(storage_directory)
+      Dir::mkdir(storage_directory)
+    end
+
+    storage_directory
+  end
+
+  def generate_hash(content)
+    Digest::SHA1.hexdigest content
   end
 
   def fetch(uri_string, limit = 10)
@@ -33,8 +49,6 @@ class DocumentsController < ApplicationController
   end
 
   def convert
-    temp_filename = '_doctor_temp'
-
     # get the source file URL
     @source = params[:source]
 
@@ -47,21 +61,29 @@ class DocumentsController < ApplicationController
       return
     end
 
-    # save a copy of the source file
-    File.open("#{Rails.root}/tmp/#{temp_filename}", 'wb') do |f|
+    # prepare storage directory and file parameters
+    storage_directory = get_storage_directory
+    file_name = generate_hash response.body
+    file_path = "#{storage_directory}/#{file_name}"
+
+    # save a temporary copy of the source file
+    File.open(file_path, 'wb') do |f|
       f.write response.body
     end
 
     # TODO: detect whether conversion is needed/possible (filter MIME types?)
 
     # use Docsplit to create the PDF version of the source file
-    Docsplit.extract_pdf("#{Rails.root}/tmp/#{temp_filename}", :output => "#{Rails.root}/tmp")
+    Docsplit.extract_pdf(file_path, :output => storage_directory)
+
+    # delete the temporary source file
+    File::delete(file_path)
 
     # TODO: do we need to enable CORS?
     #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
 
     # output the converted file
-    send_file "#{Rails.root}/tmp/#{temp_filename}.pdf", :type => 'application/pdf', :disposition => 'inline'
+    send_file "#{file_path}.pdf", :type => 'application/pdf', :disposition => 'inline'
   end
 
 end
