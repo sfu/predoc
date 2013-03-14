@@ -87,6 +87,13 @@ class DocumentsController < ApplicationController
 
       # delete the temporary source file
       File::delete(file_path)
+
+      # test whether conversion was successful (created a file)
+      unless FileTest::exists?(converted_file_path)
+        # file conversion failed; render the error page instead
+        render :action => :error, :locals => { :error => 'File cannot be converted', :source => @source }
+        return
+      end
     end
 
     # TODO: do we need to enable CORS?
