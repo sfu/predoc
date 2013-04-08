@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-Doctor::Application.load_tasks
+Predoc::Application.load_tasks

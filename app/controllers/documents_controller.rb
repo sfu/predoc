@@ -12,7 +12,7 @@ class DocumentsController < ApplicationController
   end
 
   def get_storage_directory
-    storage_directory = "#{Rails.root}/tmp/doctor"
+    storage_directory = "#{Rails.root}/tmp/predoc"
 
     # create storage directory unless already exists
     unless FileTest::directory?(storage_directory)
