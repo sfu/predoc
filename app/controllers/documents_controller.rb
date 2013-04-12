@@ -11,15 +11,22 @@ class DocumentsController < ApplicationController
     @source = params[:source]
   end
 
-  def get_storage_directory
-    storage_directory = "#{Rails.root}/tmp/predoc"
+  def get_working_directory
+    "#{Rails.root}/tmp/predoc"
+  end
 
-    # create storage directory unless already exists
-    unless FileTest::directory?(storage_directory)
-      Dir::mkdir(storage_directory)
+  def get_cache_directory(hash)
+    # construct a nested directory structure using the first two characters of the hash
+    # e.g. b12f9a33c5afa6fe98286465a5c453c1898d07f7 will be stored in {root}/b/1
+    hash_chars = hash.split('')
+    cache_directory = "#{get_working_directory}/#{hash_chars[0]}/#{hash_chars[1]}"
+
+    # create directory unless already exists
+    unless FileTest::directory?(cache_directory)
+      FileUtils::makedirs(cache_directory)
     end
 
-    storage_directory
+    cache_directory
   end
 
   def generate_hash(content)
@@ -61,46 +68,51 @@ class DocumentsController < ApplicationController
       return
     end
 
-    # prepare storage directory and file parameters
-    storage_directory = get_storage_directory
-    file_name = generate_hash response.body
-    file_path = "#{storage_directory}/#{file_name}"
-    converted_file_path = "#{file_path}.pdf"
+    # prepare directory and file paths
+    hash = generate_hash response.body
+    cache_directory = get_cache_directory hash
+    temp_path = "#{get_working_directory}/#{hash}"
+    converted_path = "#{temp_path}.pdf"
+    cached_path = "#{cache_directory}/#{hash}.pdf"
 
     # TODO: (security considerations) if there is ever a collision in the hash,
     # someone will see the preview of a different (potentially someone else's) file
 
-    # Convert the source file unless a cached conversion already exists.
+    # Convert the source file unless a cached conversion already exists. The cached file has the same name as the
+    # hash of its original contents.
     #
-    # NOTE: A source document is deemed to have a cached copy if there is a converted document
-    # whose filename matches the hash of its contents.
-    unless FileTest::exists?(converted_file_path)
+    # NOTE: The file is first converted in the working directory and then moved to the cache, because this will keep
+    # the temporary "LibreOffice" directory in one single place.
+    unless FileTest::exists?(cached_path)
       # save a temporary copy of the source file
-      File.open(file_path, 'wb') do |f|
+      File.open(temp_path, 'wb') do |f|
         f.write response.body
       end
 
       # TODO: detect whether conversion is needed/possible (filter MIME types?)
 
       # use Docsplit to create the PDF version of the source file
-      Docsplit.extract_pdf(file_path, :output => storage_directory)
+      Docsplit.extract_pdf(temp_path, :output => get_working_directory)
 
       # delete the temporary source file
-      File::delete(file_path)
+      File::delete(temp_path)
 
       # test whether conversion was successful (created a file)
-      unless FileTest::exists?(converted_file_path)
+      unless FileTest::exists?(converted_path)
         # file conversion failed; render the error page instead
         render :action => :error, :locals => { :error => 'File cannot be converted', :source => @source }
         return
       end
+
+      # move the converted file into the cache
+      FileUtils::move(converted_path, cached_path)
     end
 
     # TODO: do we need to enable CORS?
     #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
 
     # output the converted file
-    send_file converted_file_path, :type => 'application/pdf', :disposition => 'inline'
+    send_file cached_path, :type => 'application/pdf', :disposition => 'inline'
   end
 
 end
