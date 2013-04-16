@@ -91,16 +91,22 @@ class DocumentsController < ApplicationController
 
       # TODO: detect whether conversion is needed/possible (filter MIME types?)
 
-      # use Docsplit to create the PDF version of the source file
-      Docsplit.extract_pdf(temp_path, :output => get_working_directory)
+      begin
+        # use Docsplit to create the PDF version of the source file
+        Docsplit.extract_pdf(temp_path, :output => get_working_directory)
+      rescue Docsplit::ExtractionFailed
+        # file conversion failed; render the error page instead
+        render :action => :error, :locals => { :error => 'Preview cannot be created from source', :source => @source }
+        return
+      end
 
       # delete the temporary source file
       File::delete(temp_path)
 
-      # test whether conversion was successful (created a file)
+      # test whether conversion yielded a file
       unless FileTest::exists?(converted_path)
-        # file conversion failed; render the error page instead
-        render :action => :error, :locals => { :error => 'File cannot be converted', :source => @source }
+        # missing converted file; render the error page instead
+        render :action => :error, :locals => { :error => 'Preview was not created properly', :source => @source }
         return
       end
 
