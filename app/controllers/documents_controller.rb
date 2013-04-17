@@ -89,15 +89,13 @@ class DocumentsController < ApplicationController
     converted_path = "#{temp_path}.pdf"
     cached_path = "#{cache_directory}/#{hash}.pdf"
 
-    # TODO: (security considerations) if there is ever a collision in the hash,
-    # someone will see the preview of a different (potentially someone else's) file
-
     # If a cached conversion already exists, output it immediately. The cached file has the same name as the hash of its
     # original contents.
     if FileTest::exists?(cached_path)
       send_pdf cached_path
       return
     end
+    # TODO: consider security implications of using the hash to cache files (e.g. what happens if a collision occurs?)
 
     # save a temporary copy of the source file
     File.open(temp_path, 'wb') do |f|
@@ -114,7 +112,7 @@ class DocumentsController < ApplicationController
     # REVIEW: Should we preemptively blacklist certain incompatible MIME types so we can avoid unnecessary conversion?
 
     begin
-      # use Docsplit to create the PDF version of the source file
+      # create the PDF version of the source file
       Docsplit.extract_pdf(temp_path, :output => get_working_directory)
     rescue Docsplit::ExtractionFailed
       # TODO: consider combining this with the FileTest::exists? check below...
@@ -123,7 +121,7 @@ class DocumentsController < ApplicationController
       return
     end
 
-    # delete the temporary source file
+    # the source file is no longer needed
     File::delete(temp_path)
 
     # test whether conversion yielded a file
@@ -133,10 +131,8 @@ class DocumentsController < ApplicationController
       return
     end
 
-    # move the converted file into the cache
+    # save the converted file to cache and output it
     FileUtils::move(converted_path, cached_path)
-
-    # output the converted file
     send_pdf cached_path
   end
 
