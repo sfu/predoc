@@ -16,4 +16,5 @@
 
 # Ignore configuration files.
 /config/initializers/predoc.rb
+/config/test.rb
 

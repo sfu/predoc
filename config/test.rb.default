@@ -1,0 +1,19 @@
+module Predoc
+  module TestConfig
+
+    # Test documents to test conversion
+    FIXTURE_URLS = {
+        doc: 'http://example.com/test.doc',
+        xls: 'http://example.com/test.xls',
+        ppt: 'http://example.com/test.ppt',
+        docx: 'http://example.com/test.docx',
+        xlsx: 'http://example.com/test.xlsx',
+        pptx: 'http://example.com/test.pptx',
+        txt: 'http://example.com/test.txt',
+        rtf: 'http://example.com/test.rtf',
+        html: 'http://example.com/test.html',
+        fake: 'http://example.com/test.fake'
+    }
+
+  end
+end
