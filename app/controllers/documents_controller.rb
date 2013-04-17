@@ -33,6 +33,10 @@ class DocumentsController < ApplicationController
     Digest::SHA1.hexdigest content
   end
 
+  def send_pdf(path)
+    send_file path, :type => 'application/pdf', :disposition => 'inline'
+  end
+
   def fetch(uri_string, limit = 10)
     # prevent redirect loops
     raise StandardError, 'Too many redirects' if limit == 0
@@ -118,7 +122,7 @@ class DocumentsController < ApplicationController
     #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
 
     # output the converted file
-    send_file cached_path, :type => 'application/pdf', :disposition => 'inline'
+    send_pdf cached_path
   end
 
 end
