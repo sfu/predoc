@@ -33,6 +33,13 @@ class DocumentsController < ApplicationController
     Digest::SHA1.hexdigest content
   end
 
+  def read_mime_type(path)
+    # read the file MIME type using the `file` command
+    # NOTE: We are intentionally ignoring any errors (and returning nil) because even if the file type is unknown, we
+    # will still attempt to process the file.
+    IO.popen(['file', '--brief', '--mime-type', path]).read.chomp rescue nil
+  end
+
   def send_pdf(path)
     send_file path, :type => 'application/pdf', :disposition => 'inline'
   end
@@ -60,6 +67,9 @@ class DocumentsController < ApplicationController
   end
 
   def convert
+    # TODO: do we need to enable CORS?
+    #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
+
     # get the source file URL
     @source = params[:source]
 
@@ -82,44 +92,49 @@ class DocumentsController < ApplicationController
     # TODO: (security considerations) if there is ever a collision in the hash,
     # someone will see the preview of a different (potentially someone else's) file
 
-    # Convert the source file unless a cached conversion already exists. The cached file has the same name as the
-    # hash of its original contents.
-    #
-    # NOTE: The file is first converted in the working directory and then moved to the cache, because this will keep
-    # the temporary "LibreOffice" directory in one single place.
-    unless FileTest::exists?(cached_path)
-      # save a temporary copy of the source file
-      File.open(temp_path, 'wb') do |f|
-        f.write response.body
-      end
-
-      # TODO: detect whether conversion is needed/possible (filter MIME types?)
-
-      begin
-        # use Docsplit to create the PDF version of the source file
-        Docsplit.extract_pdf(temp_path, :output => get_working_directory)
-      rescue Docsplit::ExtractionFailed
-        # file conversion failed; render the error page instead
-        render :action => :error, :locals => { :error => 'Preview cannot be created from source', :source => @source }
-        return
-      end
-
-      # delete the temporary source file
-      File::delete(temp_path)
-
-      # test whether conversion yielded a file
-      unless FileTest::exists?(converted_path)
-        # missing converted file; render the error page instead
-        render :action => :error, :locals => { :error => 'Preview was not created properly', :source => @source }
-        return
-      end
-
-      # move the converted file into the cache
-      FileUtils::move(converted_path, cached_path)
+    # If a cached conversion already exists, output it immediately. The cached file has the same name as the hash of its
+    # original contents.
+    if FileTest::exists?(cached_path)
+      send_pdf cached_path
+      return
     end
 
-    # TODO: do we need to enable CORS?
-    #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
+    # save a temporary copy of the source file
+    File.open(temp_path, 'wb') do |f|
+      f.write response.body
+    end
+
+    # If the source file is already a PDF, no conversion is needed. Just save it into cache and output it immediately.
+    mime_type = read_mime_type temp_path
+    if mime_type == 'application/pdf'
+      FileUtils::move(temp_path, cached_path)
+      send_pdf cached_path
+      return
+    end
+    # REVIEW: Should we preemptively blacklist certain incompatible MIME types so we can avoid unnecessary conversion?
+
+    begin
+      # use Docsplit to create the PDF version of the source file
+      Docsplit.extract_pdf(temp_path, :output => get_working_directory)
+    rescue Docsplit::ExtractionFailed
+      # TODO: consider combining this with the FileTest::exists? check below...
+      # file conversion failed; render the error page instead
+      render :action => :error, :locals => { :error => 'Preview cannot be created from source', :source => @source }
+      return
+    end
+
+    # delete the temporary source file
+    File::delete(temp_path)
+
+    # test whether conversion yielded a file
+    unless FileTest::exists?(converted_path)
+      # missing converted file; render the error page instead
+      render :action => :error, :locals => { :error => 'Preview was not created properly', :source => @source }
+      return
+    end
+
+    # move the converted file into the cache
+    FileUtils::move(converted_path, cached_path)
 
     # output the converted file
     send_pdf cached_path
