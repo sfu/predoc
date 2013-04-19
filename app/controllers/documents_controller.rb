@@ -11,15 +11,11 @@ class DocumentsController < ApplicationController
     @source = params[:source]
   end
 
-  def get_working_directory
-    "#{Rails.root}/tmp/predoc"
-  end
-
   def get_cache_directory(hash)
     # construct a nested directory structure using the first two characters of the hash
     # e.g. b12f9a33c5afa6fe98286465a5c453c1898d07f7 will be stored in {root}/b/1
     hash_chars = hash.split('')
-    cache_directory = "#{get_working_directory}/#{hash_chars[0]}/#{hash_chars[1]}"
+    cache_directory = "#{Predoc::Config::CACHE_ROOT_DIRECTORY}/#{hash_chars[0]}/#{hash_chars[1]}"
 
     # create directory unless already exists
     unless FileTest::directory?(cache_directory)
@@ -85,7 +81,7 @@ class DocumentsController < ApplicationController
     # prepare directory and file paths
     hash = generate_hash response.body
     cache_directory = get_cache_directory hash
-    temp_path = "#{get_working_directory}/#{hash}"
+    temp_path = "#{Predoc::Config::WORKING_DIRECTORY}/#{hash}"
     converted_path = "#{temp_path}.pdf"
     cached_path = "#{cache_directory}/#{hash}.pdf"
 
@@ -113,7 +109,7 @@ class DocumentsController < ApplicationController
 
     begin
       # create the PDF version of the source file
-      Docsplit.extract_pdf(temp_path, :output => get_working_directory)
+      Docsplit.extract_pdf(temp_path, :output => Predoc::Config::WORKING_DIRECTORY)
     rescue Docsplit::ExtractionFailed
       # TODO: consider combining this with the FileTest::exists? check below...
       # file conversion failed; render the error page instead

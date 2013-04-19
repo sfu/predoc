@@ -1,0 +1,11 @@
+module Predoc
+  module Config
+
+    # Workspace for temporary/intermediate files
+    WORKING_DIRECTORY = "#{Rails.root}/tmp"
+
+    # Root location for caching converted files
+    CACHE_ROOT_DIRECTORY = "#{Rails.root}/tmp/predoc"
+
+  end
+end
