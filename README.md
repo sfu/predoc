@@ -12,6 +12,15 @@ Predoc uses [LibreOffice](http://www.libreoffice.org/) (via [Docsplit](http://do
 
     $ aptitude install libreoffice
 
+### Configuration
+
+You need to specify the paths for Predoc to create temporary and cache files. Create `predoc.rb` from the template file `config/initializers/predoc.rb.default` in the same location, and modify these variables:
+
+* `WORKING_DIRECTORY` is where temporary files are downloaded and stored.
+* `CACHE_ROOT_DIRECTORY` is where converted files are cached.
+
+Make sure these directories are writable by the web server.
+
 Usage
 -----
 
