@@ -26,12 +26,19 @@ class DocumentsController < ApplicationController
   end
 
   def get_temp_path(hash)
+    # create directory unless already exists
+    working_directory = "#{Predoc::Config::WORKING_DIRECTORY}"
+    unless FileTest::directory?(working_directory)
+      FileUtils::makedirs(working_directory)
+    end
+
     # There will be times when the same file is requested by multiple users in a short period of time. If we use the
     # same temp file, some requests will fail because the temp file is deleted midway by another request. The time hash
     # is based on the current time, and adds reasonable uniqueness to each request.
     # NOTE: the time hash is truncated to keep the file name length manageable
     time_hash = (Digest::SHA1.hexdigest Time.now.to_f.to_s)[0, 8]
-    "#{Predoc::Config::WORKING_DIRECTORY}/#{hash}-#{time_hash}"
+
+    "#{working_directory}/#{hash}-#{time_hash}"
   end
 
   def generate_hash(content)
