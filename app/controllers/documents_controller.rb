@@ -120,10 +120,8 @@ class DocumentsController < ApplicationController
       # create the PDF version of the source file
       Docsplit.extract_pdf(temp_path, :output => Predoc::Config::WORKING_DIRECTORY)
     rescue Docsplit::ExtractionFailed
-      # TODO: consider combining this with the FileTest::exists? check below...
-      # file conversion failed; render the error page instead
-      render :action => :error, :locals => { :error => 'Preview cannot be created from source', :source => @source }
-      return
+      # This exception is thrown when the extraction exited with a non-zero status. This is handled later because the
+      # conversion would not have yielded a file. Do nothing now.
     end
 
     # the source file is no longer needed
@@ -132,7 +130,7 @@ class DocumentsController < ApplicationController
     # test whether conversion yielded a file
     unless FileTest::exists?(converted_path)
       # missing converted file; render the error page instead
-      render :action => :error, :locals => { :error => 'Preview was not created properly', :source => @source }
+      render :action => :error, :locals => { :error => 'Preview failed to be created', :source => @source }
       return
     end
 
