@@ -25,6 +25,15 @@ class DocumentsController < ApplicationController
     cache_directory
   end
 
+  def get_temp_path(hash)
+    # There will be times when the same file is requested by multiple users in a short period of time. If we use the
+    # same temp file, some requests will fail because the temp file is deleted midway by another request. The time hash
+    # is based on the current time, and adds reasonable uniqueness to each request.
+    # NOTE: the time hash is truncated to keep the file name length manageable
+    time_hash = (Digest::SHA1.hexdigest Time.now.to_f.to_s)[0, 8]
+    "#{Predoc::Config::WORKING_DIRECTORY}/#{hash}-#{time_hash}"
+  end
+
   def generate_hash(content)
     Digest::SHA1.hexdigest content
   end
@@ -81,7 +90,7 @@ class DocumentsController < ApplicationController
     # prepare directory and file paths
     hash = generate_hash response.body
     cache_directory = get_cache_directory hash
-    temp_path = "#{Predoc::Config::WORKING_DIRECTORY}/#{hash}"
+    temp_path = get_temp_path hash
     converted_path = "#{temp_path}.pdf"
     cached_path = "#{cache_directory}/#{hash}.pdf"
 
