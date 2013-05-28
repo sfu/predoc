@@ -1,3 +1,8 @@
+/*  ...
+ *= require chromeless
+ *= require_self
+ */
+
 iframe {
     margin: 0;
     padding: 0;
