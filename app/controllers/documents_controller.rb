@@ -87,10 +87,12 @@ class DocumentsController < ApplicationController
 
     # read the source file to be converted
     begin
+      logger.info("[Predoc] Request: #{@source}")
       response = fetch(@source, 10)
     rescue Exception => e
       # error occurred; render the error page instead
       render :action => :error, :locals => { :error => e.to_s, :source => @source }
+      logger.error("[Predoc] Cannot read #{@source}")
       return
     end
 
@@ -104,6 +106,7 @@ class DocumentsController < ApplicationController
     # If a cached conversion already exists, output it immediately. The cached file has the same name as the hash of its
     # original contents.
     if FileTest::exists?(cached_path)
+      logger.info("[Predoc] Done; Skip conversion, sending from cache #{@source} (#{hash})")
       send_pdf cached_path
       return
     end
@@ -118,6 +121,7 @@ class DocumentsController < ApplicationController
     mime_type = read_mime_type temp_path
     if mime_type == 'application/pdf'
       FileUtils::move(temp_path, cached_path)
+      logger.info("[Predoc] Done; Skip conversion, caching PDF directly #{@source} (#{hash})")
       send_pdf cached_path
       return
     end
@@ -125,10 +129,13 @@ class DocumentsController < ApplicationController
 
     begin
       # create the PDF version of the source file
+      logger.info("[Predoc] Converting #{@source} (#{hash})")
       Docsplit.extract_pdf(temp_path, :output => Predoc::Config::WORKING_DIRECTORY)
+      logger.info("[Predoc] Conversion done #{@source} (#{hash})")
     rescue Docsplit::ExtractionFailed
       # This exception is thrown when the extraction exited with a non-zero status. This is handled later because the
-      # conversion would not have yielded a file. Do nothing now.
+      # conversion would not have yielded a file.
+      logger.error("[Predoc] Docsplit::ExtractionFailed for #{@source} (#{hash})")
     end
 
     # the source file is no longer needed
@@ -138,11 +145,13 @@ class DocumentsController < ApplicationController
     unless FileTest::exists?(converted_path)
       # missing converted file; render the error page instead
       render :action => :error, :locals => { :error => 'Preview failed to be created', :source => @source }
+      logger.error("[Predoc] Cannot convert #{@source} (#{hash})")
       return
     end
 
     # save the converted file to cache and output it
     FileUtils::move(converted_path, cached_path)
+    logger.info("[Predoc] Done; Sending converted #{@source} (#{hash})")
     send_pdf cached_path
   end
 
