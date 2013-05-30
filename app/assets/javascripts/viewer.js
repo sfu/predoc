@@ -2,6 +2,18 @@
 
 (function ($) {
 
+    function getActiveXObject(name)
+    {
+        try { return new ActiveXObject(name); } catch (e) { return undefined; }
+    }
+
+    // Returns true on IE (supports ActiveX) that supports one of the PDF plugins.
+    // Also returns true on any browser that doesn't support ActiveX.
+    function checkIEPDFSupport()
+    {
+        return (!window.ActiveXObject || getActiveXObject('AcroPDF.PDF') || getActiveXObject('PDF.PdfCtrl'));
+    }
+
     function showDocument()
     {
         $('#document').show();
@@ -29,6 +41,15 @@
     $(document).ready(function () {
 
         var converterPath = '/documents/convert';
+
+        // just abort if client is using IE that lacks PDF support
+        if (!checkIEPDFSupport())
+        {
+            $('#alternative').show();
+            $('#alt-plugin').show();
+            $('#loading-indicator').hide();
+            return;
+        }
 
         // create the <iframe> to display the converted document seamlessly
         $('<iframe>')

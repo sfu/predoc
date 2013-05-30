@@ -5,4 +5,8 @@
 
 <div id="viewer-messages">
   <div id="loading-indicator" data-viewer-source="<%= @source %>">Loading document preview. One moment please...</div>
+  <div id="alternative">
+    <p id="alt-plugin" class="alt">It appears that you do not have the necessary software installed to view the preview.</p>
+    <p><a href="<%= @source %>">Download the document</a></p>
+  </div>
 </div>

@@ -18,5 +18,11 @@ iframe {
 }
 
 #loading-indicator {
+    margin-bottom: 2em;
     color: #666;
+}
+
+#alternative, #alternative .alt
+{
+    display: none;
 }
