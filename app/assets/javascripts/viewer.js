@@ -21,7 +21,6 @@
         // we don't need the timeout timer anymore
         clearTimeout(loadingTimeout);
 
-        $('#document').show();
         $('#viewer-messages').hide();
     }
 
@@ -70,7 +69,6 @@
             .attr('height', '100%')
             .attr('seamless', 'seamless')
             .bind('load', showDocument)
-            .hide()
             .appendTo('body');
 
         // start the timeout timer so users don't have to wait forever
