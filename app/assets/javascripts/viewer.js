@@ -2,6 +2,8 @@
 
 (function ($) {
 
+    var loadingTimeout;
+
     function getActiveXObject(name)
     {
         try { return new ActiveXObject(name); } catch (e) { return undefined; }
@@ -16,8 +18,17 @@
 
     function showDocument()
     {
+        // we don't need the timeout timer anymore
+        clearTimeout(loadingTimeout);
+
         $('#document').show();
         $('#viewer-messages').hide();
+    }
+
+    function showTimeout()
+    {
+        $('#alternative').show();
+        $('#alt-timeout').show();
     }
 
     // IE doesn't fire the onload event in a PDF iframe. We poll for the progress as an alternative.
@@ -61,6 +72,9 @@
             .bind('load', showDocument)
             .hide()
             .appendTo('body');
+
+        // start the timeout timer so users don't have to wait forever
+        loadingTimeout = setTimeout(showTimeout, 10000);
 
         checkDocumentProgress();
     });
