@@ -77,4 +77,9 @@
         checkDocumentProgress();
     });
 
+    $(window).bind('unload', function () {
+        // this fixes an issue in IE10 where the document could remain stuck on screen
+        $('#document').remove();
+    });
+
 })(jQuery);
