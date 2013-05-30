@@ -21,7 +21,7 @@
         // we don't need the timeout timer anymore
         clearTimeout(loadingTimeout);
 
-        $('#viewer-messages').hide();
+        $('#viewer-messages').fadeOut();
     }
 
     function showTimeout()
