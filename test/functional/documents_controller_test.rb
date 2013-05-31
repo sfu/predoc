@@ -20,7 +20,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test 'should assign the source parameter properly' do
     source = 'just a test'
-    get :convert, source: source
+    get :convert, url: source
     assert_equal(assigns(:source), source)
   end
 
@@ -29,32 +29,32 @@ class DocumentsControllerTest < ActionController::TestCase
   ###
 
   test 'should convert a Word document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:doc]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:doc]
     assert_pdf_sent
   end
 
   test 'should convert an Excel document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:xls]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:xls]
     assert_pdf_sent
   end
 
   test 'should convert a PowerPoint document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:ppt]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:ppt]
     assert_pdf_sent
   end
 
   test 'should convert an OOXML Word document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:docx]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:docx]
     assert_pdf_sent
   end
 
   test 'should convert an OOXML Excel document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:xlsx]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:xlsx]
     assert_pdf_sent
   end
 
   test 'should convert an OOXML PowerPoint document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:pptx]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:pptx]
     assert_pdf_sent
   end
 
@@ -63,24 +63,24 @@ class DocumentsControllerTest < ActionController::TestCase
   ###
 
   test 'should convert a plain text document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:txt]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:txt]
     assert_pdf_sent
   end
 
   test 'should convert a rich text document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:rtf]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:rtf]
     assert_pdf_sent
   end
 
   test 'should convert an HTML document' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:html]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:html]
     assert_pdf_sent
   end
 
   # TODO: test images (e.g. PNG, GIF, JPEG)
 
   test 'should handle a non-existent file' do
-    get :convert, source: Predoc::TestConfig::FIXTURE_URLS[:fake]
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:fake]
     assert_response :success
     assert_template(:error)
   end
