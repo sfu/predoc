@@ -50,7 +50,7 @@
 
     $(document).ready(function () {
 
-        var converterPath = '/documents/convert';
+        var converterPath = '/convert';
 
         // just abort if client is using IE that lacks PDF support
         if (!checkIEPDFSupport())
