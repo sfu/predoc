@@ -5,10 +5,10 @@ require 'digest/sha1'
 class DocumentsController < ApplicationController
 
   def view
-    # TODO: add page controls, and maybe pdf.js?
+    # TODO: add page controls (via params[:embedded] == true), and maybe pdf.js?
 
     # get the source file URL
-    @source = params[:source]
+    @source = params[:url]
   end
 
   def get_cache_directory(hash)
@@ -83,7 +83,7 @@ class DocumentsController < ApplicationController
     #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
 
     # get the source file URL
-    @source = params[:source]
+    @source = params[:url]
 
     # read the source file to be converted
     begin

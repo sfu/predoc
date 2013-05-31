@@ -64,7 +64,7 @@
         // create the <iframe> to display the converted document seamlessly
         $('<iframe>')
             .attr('id', 'document')
-            .attr('src', converterPath + '?source=' + encodeURIComponent($('#loading-indicator').data('viewer-source')))
+            .attr('src', converterPath + '?url=' + encodeURIComponent($('#loading-indicator').data('viewer-source')))
             .attr('width', '100%')
             .attr('height', '100%')
             .attr('seamless', 'seamless')
