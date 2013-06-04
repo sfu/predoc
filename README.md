@@ -26,6 +26,6 @@ Usage
 
 To create a preview, point your web browser to the web service:
 
-    http://example.com/documents/view?source=http://path/to/source
+    http://example.com/viewer?url=http://path/to/document
 
-*Note: Replace `example.com` with the server hostname, and `http://path/to/source` with an actual web-hosted document*
+*Note: Replace `example.com` with the server hostname, and `http://path/to/document` with an actual web-hosted document*
