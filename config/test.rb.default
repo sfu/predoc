@@ -12,6 +12,7 @@ module Predoc
         txt: 'http://example.com/test.txt',
         rtf: 'http://example.com/test.rtf',
         html: 'http://example.com/test.html',
+        mp4: 'http://example.com/test.mp4',
         fake: 'http://example.com/test.fake'
     }
 

@@ -117,15 +117,25 @@ class DocumentsController < ApplicationController
       f.write response.body
     end
 
-    # If the source file is already a PDF, no conversion is needed. Just save it into cache and output it immediately.
     mime_type = read_mime_type temp_path
+
+    # REVIEW: Preemptively blacklist certain unsupported MIME types so we can avoid unnecessary/fatal conversions
+
+    # Skip any video files. Delete it and render the error page.
+    if mime_type.include? 'video'
+      File::delete(temp_path)
+      render :action => :error, :locals => { :error => "Unsupported file type '#{mime_type}'", :source => @source }
+      logger.error("[Predoc] Unsupported file type '#{mime_type}'")
+      return
+    end
+
+    # If the source file is already a PDF, no conversion is needed. Just save it into cache and output it immediately.
     if mime_type == 'application/pdf'
       FileUtils::move(temp_path, cached_path)
       logger.info("[Predoc] Done; Skip conversion, caching PDF directly #{@source} (#{hash})")
       send_pdf cached_path
       return
     end
-    # REVIEW: Should we preemptively blacklist certain incompatible MIME types so we can avoid unnecessary conversion?
 
     begin
       # create the PDF version of the source file

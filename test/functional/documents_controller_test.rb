@@ -79,6 +79,12 @@ class DocumentsControllerTest < ActionController::TestCase
 
   # TODO: test images (e.g. PNG, GIF, JPEG)
 
+  test 'should skip a video file' do
+    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:mp4]
+    assert_response :success
+    assert_template(:error)
+  end
+
   test 'should handle a non-existent file' do
     get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:fake]
     assert_response :success
