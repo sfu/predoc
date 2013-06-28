@@ -39,6 +39,9 @@ gem 'jquery-rails'
 
 # ---
 
+# Use SyslogLogger for logging
+gem 'SyslogLogger', '~> 2.0'
+
 # Docsplit for converting documents into PDFs
-gem "docsplit", "~> 0.7.2"
+gem 'docsplit', '~> 0.7.2'
 
