@@ -59,4 +59,6 @@ Predoc::Application.routes.draw do
   match 'viewer' => 'documents#view'
   match 'convert' => 'documents#convert'
 
+  match 'status' => 'status#index'
+
 end
