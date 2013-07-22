@@ -7,5 +7,8 @@ module Predoc
     # Root location for caching converted files
     CACHE_ROOT_DIRECTORY = "#{Rails.root}/tmp/predoc"
 
+    # Maximum time allowed (in seconds) for a single conversion
+    CONVERSION_TIMEOUT = 20
+
   end
 end

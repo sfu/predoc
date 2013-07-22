@@ -21,6 +21,8 @@ You need to specify the paths for Predoc to create temporary and cache files. Cr
 
 Make sure these directories are writable by the web server.
 
+In addition, you can configure the maximum number of seconds allowed for a single conversion by changing `CONVERSION_TIMEOUT`.
+
 Usage
 -----
 

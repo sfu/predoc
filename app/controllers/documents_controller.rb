@@ -1,6 +1,7 @@
 require 'net/https'
 require 'docsplit'
 require 'digest/sha1'
+require 'timeout'
 
 class DocumentsController < ApplicationController
 
@@ -137,15 +138,32 @@ class DocumentsController < ApplicationController
       return
     end
 
+    # When converting certain documents (typically ones that are more complicated), the conversion process could hang.
+    # In order to prevent this from paralyzing the overall service, we need a timeout. By forking the conversion into
+    # its own subprocess, we can easily and cleanly kill everything in the event of a timeout.
+    convert_pid = fork do
+      # make this process the group leader (necessary for killing all child processes as a group)
+      Process.setpgrp
+      begin
+        # create the PDF version of the source file
+        logger.info("[Predoc] Converting #{@source} (#{hash})")
+        Docsplit.extract_pdf(temp_path, :output => Predoc::Config::WORKING_DIRECTORY)
+        logger.info("[Predoc] Conversion done #{@source} (#{hash})")
+      rescue Docsplit::ExtractionFailed
+        # This exception is thrown when the extraction exited with a non-zero status. This is handled later because the
+        # conversion would not have yielded a file.
+        logger.error("[Predoc] Docsplit::ExtractionFailed for #{@source} (#{hash})")
+      end
+    end
+
     begin
-      # create the PDF version of the source file
-      logger.info("[Predoc] Converting #{@source} (#{hash})")
-      Docsplit.extract_pdf(temp_path, :output => Predoc::Config::WORKING_DIRECTORY)
-      logger.info("[Predoc] Conversion done #{@source} (#{hash})")
-    rescue Docsplit::ExtractionFailed
-      # This exception is thrown when the extraction exited with a non-zero status. This is handled later because the
-      # conversion would not have yielded a file.
-      logger.error("[Predoc] Docsplit::ExtractionFailed for #{@source} (#{hash})")
+      # wait for the conversion subprocess to complete -- with a timeout
+      Timeout::timeout(Predoc::Config::CONVERSION_TIMEOUT) { Process.wait(convert_pid) }
+    rescue Timeout::Error
+      # This exception is thrown when the conversion takes too long. Kill the conversion subprocess group (note the
+      # negative PID).
+      logger.error("[Predoc] Timeout::Error for #{@source} (#{hash})")
+      Process.kill('TERM', -Process.getpgid(convert_pid))
     end
 
     # the source file is no longer needed
