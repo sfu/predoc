@@ -12,7 +12,8 @@ Predoc uses [LibreOffice](http://www.libreoffice.org/) (via [Docsplit](http://do
 
     $ aptitude install libreoffice
 
-### Configuration
+Configuration
+-------------
 
 You need to specify the paths for Predoc to create temporary and cache files. Create `predoc.rb` from the template file `config/initializers/predoc.rb.default` at the same location, and modify these variables:
 
@@ -22,6 +23,26 @@ You need to specify the paths for Predoc to create temporary and cache files. Cr
 Make sure these directories are writable by the web server.
 
 In addition, you can configure the maximum number of seconds allowed for a single conversion by changing `CONVERSION_TIMEOUT`.
+
+### Conversion Statistics
+
+If you use [StatsD](https://github.com/etsy/statsd/) to keep track of statistics, you can enable it by setting `STATSD_HOST`. Also configure `STATSD_PORT` and `STATSD_NAMESPACE` as needed. The application will increment one or more of the following stats related to requests for preview:
+
+* General
+  * `request` — when a preview is requested
+  * `convert` — when a conversion process begins
+  * `converted` — when a conversion process ends (sent as duration in milliseconds)
+* Preview request successful
+  * `sent.cached` — when a cached preview is available and sent
+  * `sent.passthru` — when a PDF source file is sent directly without conversion
+  * `sent.converted` — when a document is converted and sent
+* Error handled internally
+  * `rescue.inconvertible` — when an error occurred during a conversion process
+  * `rescue.timeout` — when a conversion took too long and is aborted
+* Preview request failed
+  * `error.unreadable` — when a source file is not found or cannot be read
+  * `error.unsupported` — when a source file type is not supported
+  * `error.incomplete` — when a conversion yielded nothing due to some errors
 
 Usage
 -----

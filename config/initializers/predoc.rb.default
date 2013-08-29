@@ -10,5 +10,14 @@ module Predoc
     # Maximum time allowed (in seconds) for a single conversion
     CONVERSION_TIMEOUT = 20
 
+    # StatsD daemon host name (use nil to disable StatsD)
+    STATSD_HOST = nil
+
+    # StatsD daemon port number
+    STATSD_PORT = 8125
+
+    # Prefix added to every stat name (use nil to omit)
+    STATSD_NAMESPACE = 'predoc'
+
   end
 end

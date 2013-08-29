@@ -83,17 +83,25 @@ class DocumentsController < ApplicationController
     # TODO: do we need to enable CORS?
     #response.headers["Access-Control-Allow-Origin"] = "http://localhost"
 
+    # Send events to StatsD (if configured to do so)
+    if defined?(Predoc::Config::STATSD_HOST) && Predoc::Config::STATSD_HOST
+      statsd = Statsd.new Predoc::Config::STATSD_HOST, Predoc::Config::STATSD_PORT
+      statsd.namespace = Predoc::Config::STATSD_NAMESPACE
+    end
+
     # get the source file URL
     @source = params[:url]
 
     # read the source file to be converted
     begin
       logger.info("[Predoc] Request: #{@source}")
+      statsd.increment 'request' if statsd
       response = fetch(@source, 10)
     rescue Exception => e
       # error occurred; render the error page instead
       render :action => :error, :locals => { :error => e.to_s, :source => @source }
       logger.error("[Predoc] Cannot read #{@source}")
+      statsd.increment 'error.unreadable' if statsd
       return
     end
 
@@ -108,6 +116,7 @@ class DocumentsController < ApplicationController
     # original contents.
     if FileTest::exists?(cached_path)
       logger.info("[Predoc] Done; Skip conversion, sending from cache #{@source} (#{hash})")
+      statsd.increment 'sent.cached' if statsd
       send_pdf cached_path
       return
     end
@@ -127,6 +136,7 @@ class DocumentsController < ApplicationController
       File::delete(temp_path)
       render :action => :error, :locals => { :error => "Unsupported file type '#{mime_type}'", :source => @source }
       logger.error("[Predoc] Unsupported file type '#{mime_type}'")
+      statsd.increment 'error.unsupported' if statsd
       return
     end
 
@@ -134,6 +144,7 @@ class DocumentsController < ApplicationController
     if mime_type == 'application/pdf'
       FileUtils::move(temp_path, cached_path)
       logger.info("[Predoc] Done; Skip conversion, caching PDF directly #{@source} (#{hash})")
+      statsd.increment 'sent.passthru' if statsd
       send_pdf cached_path
       return
     end
@@ -147,12 +158,17 @@ class DocumentsController < ApplicationController
       begin
         # create the PDF version of the source file
         logger.info("[Predoc] Converting #{@source} (#{hash})")
+        statsd.increment 'convert' if statsd
+        convert_start = Time.now
         Docsplit.extract_pdf(temp_path, :output => Predoc::Config::WORKING_DIRECTORY)
-        logger.info("[Predoc] Conversion done #{@source} (#{hash})")
+        convert_duration = ((Time.now - convert_start) * 1000).round
+        logger.info("[Predoc] Conversion done in #{convert_duration}ms #{@source} (#{hash})")
+        statsd.timing 'converted', convert_duration if statsd
       rescue Docsplit::ExtractionFailed
         # This exception is thrown when the extraction exited with a non-zero status. This is handled later because the
         # conversion would not have yielded a file.
         logger.error("[Predoc] Docsplit::ExtractionFailed for #{@source} (#{hash})")
+        statsd.increment 'rescue.inconvertible' if statsd
       end
     end
 
@@ -163,6 +179,7 @@ class DocumentsController < ApplicationController
       # This exception is thrown when the conversion takes too long. Kill the conversion subprocess group (note the
       # negative PID).
       logger.error("[Predoc] Timeout::Error for #{@source} (#{hash})")
+      statsd.increment 'rescue.timeout' if statsd
       Process.kill('TERM', -Process.getpgid(convert_pid))
     end
 
@@ -174,12 +191,14 @@ class DocumentsController < ApplicationController
       # missing converted file; render the error page instead
       render :action => :error, :locals => { :error => 'Preview failed to be created', :source => @source }
       logger.error("[Predoc] Cannot convert #{@source} (#{hash})")
+      statsd.increment 'error.incomplete' if statsd
       return
     end
 
     # save the converted file to cache and output it
     FileUtils::move(converted_path, cached_path)
     logger.info("[Predoc] Done; Sending converted #{@source} (#{hash})")
+    statsd.increment 'sent.converted' if statsd
     send_pdf cached_path
   end
 
