@@ -48,9 +48,8 @@ class DocumentsController < ApplicationController
 
   def read_mime_type(path)
     # read the file MIME type using the `file` command
-    # NOTE: We are intentionally ignoring any errors (and returning nil) because even if the file type is unknown, we
-    # will still attempt to process the file.
-    IO.popen(['file', '--brief', '--mime-type', path]).read.chomp rescue nil
+    # NOTE: Returns nil if exception thrown. The return value could contain error messages (e.g. no such file).
+    IO.popen(['file', '--brief', '--mime-type', path]) { |io| io.read.chomp } rescue nil
   end
 
   def send_pdf(path)
@@ -181,6 +180,8 @@ class DocumentsController < ApplicationController
       logger.error("[Predoc] Timeout::Error for #{@source} (#{hash})")
       statsd.increment 'rescue.timeout' if statsd
       Process.kill('TERM', -Process.getpgid(convert_pid))
+      # make sure we "reap" the terminated child process; we don't want zombies
+      Process.wait(convert_pid)
     end
 
     # the source file is no longer needed
