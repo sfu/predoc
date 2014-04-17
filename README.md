@@ -44,6 +44,11 @@ If you use [StatsD](https://github.com/etsy/statsd/) to keep track of statistics
   * `error.unsupported` — when a source file type is not supported
   * `error.incomplete` — when a conversion yielded nothing due to some errors
 
+Deployment
+----------
+
+You can use Capistrano to deploy Predoc. Create `deploy.rb` from the template file `config/deploy.rb.example` at the same location. Customize settings as needed. You have the option to deploy to multiple stages (e.g. staging, production, etc.) In that case, you'll need to create `config/deploy/{stage_name}.rb` as well.
+
 Usage
 -----
 
