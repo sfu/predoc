@@ -6,6 +6,7 @@ class StatusController < ApplicationController
     status[:cache_directory_writable] = File.writable? Predoc::Config::CACHE_ROOT_DIRECTORY
     status[:working_directory_writable] = File.writable? Predoc::Config::WORKING_DIRECTORY
     status[:converter] = can_convert?
+    status[:app_node] = (Socket.gethostname || '').split('.').first
 
     # prepare and render outputs
     status_text = status.all? { |key, status| status } ? 'OK' : 'PROBLEM'
