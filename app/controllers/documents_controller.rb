@@ -99,7 +99,7 @@ class DocumentsController < ApplicationController
     rescue Exception => e
       # error occurred; render the error page instead
       render :action => :error, :locals => { :error => e.to_s, :source => @source }
-      logger.error("[Predoc] Cannot read #{@source}")
+      logger.error("[Predoc] Cannot read #{@source} due to #{e.class} (#{e.to_s})")
       statsd.increment 'error.unreadable' if statsd
       return
     end
