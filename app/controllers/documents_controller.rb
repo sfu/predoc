@@ -89,7 +89,9 @@ class DocumentsController < ApplicationController
     end
 
     # get the source file URL
-    @source = params[:url]
+    # @source = params[:url]
+    # url encdoe when url Include Chinese
+    @source = URI.encode(params[:url].strip)
 
     # read the source file to be converted
     begin
