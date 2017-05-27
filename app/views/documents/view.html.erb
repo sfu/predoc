@@ -4,10 +4,10 @@
 <% end %>
 
 <div id="viewer-messages">
-  <div id="loading-indicator" data-viewer-source="<%= @source %>">Loading document preview. One moment please...</div>
+  <div id="loading-indicator" data-viewer-source="<%= @source %>">文档加载中. 请稍候...</div>
   <div id="alternative">
     <p id="alt-plugin" class="alt">It appears that you do not have the necessary software installed to view the preview.</p>
-    <p id="alt-timeout" class="alt">The document preview is taking longer than expected to load.</p>
-    <p><a href="<%= @source %>">Download the document</a></p>
+    <p id="alt-timeout" class="alt">加载文档预览的时间要比预期的要长...</p>
+    <p><a href="<%= @source %>">下载文档</a></p>
   </div>
 </div>
