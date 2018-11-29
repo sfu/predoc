@@ -15,6 +15,19 @@ Predoc uses [LibreOffice](http://www.libreoffice.org/) (via [Docsplit](http://do
 centos7:   
     yum install libreoffice
 
+乱码
+centos7:
+    cp simsun.ttc /usr/share/fonts
+    yum install mkfontscale
+    mkfontscale
+    mkfontdir
+    fc-cache
+
+ubuntu:
+    sudo cp simsun.ttc /usr/share/fonts
+    sudo chmod 644 simsun.ttc
+    sudo fc-cache -fv
+
 Configuration
 -------------
 
