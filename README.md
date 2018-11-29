@@ -84,10 +84,16 @@ nginx.conf:
 ```
     location /viewer/ {
         proxy_pass http://127.0.0.1:9000;
+        proxy_connect_timeout 600s;
+        proxy_send_timeout 600s;
+        proxy_read_timeout 600s        
     }
 
     location /convert/ {
         proxy_pass http://127.0.0.1:9000;
+        proxy_connect_timeout 600s;
+        proxy_send_timeout 600s;
+        proxy_read_timeout 600s        
     }
 
     location /assets/ {
@@ -109,6 +115,9 @@ server {
         proxy_set_header Host $http_host;
         #proxy_set_header X-Forwarded-Proto https;
         proxy_redirect default;
+        proxy_connect_timeout 600s;
+        proxy_send_timeout 600s;
+        proxy_read_timeout 600s;        
         proxy_buffer_size       32k;
         proxy_buffers           32 256k;
         proxy_busy_buffers_size 512k;
