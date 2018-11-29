@@ -12,6 +12,9 @@ Predoc uses [LibreOffice](http://www.libreoffice.org/) (via [Docsplit](http://do
 
     $ aptitude install libreoffice
 
+centos7:   
+    yum install libreoffice
+
 Configuration
 -------------
 
@@ -78,6 +81,22 @@ Note
 
 nginx.conf:
 
+```
+    location /viewer/ {
+        proxy_pass http://127.0.0.1:9000;
+    }
+
+    location /convert/ {
+        proxy_pass http://127.0.0.1:9000;
+    }
+
+    location /assets/ {
+        proxy_pass http://127.0.0.1:9000;
+    }
+
+```
+
+predoc.conf
 ```
 server {
     listen 9000;
