@@ -1,4 +1,4 @@
-source 'http://gems.ruby-china.org'
+source 'https://gems.ruby-china.com'
 
 gem 'rails', '3.2.12'
 
@@ -48,3 +48,4 @@ gem 'statsd-ruby', '~> 1.2.1'
 # Docsplit for converting documents into PDFs
 gem 'docsplit', '~> 0.7.2'
 
+gem 'puma', '~> 3.12.0'

@@ -64,3 +64,33 @@ Testing
 To run unit tests, first create `test.rb` from the template file `config/test.rb.default` at the same location. Change the URL values in `FIXTURE_URLS` to real web-hosted test documents (not provided). Run this command to start the test:
 
     ruby -Itest test/functional/documents_controller_test.rb
+
+
+
+Note
+-------
+
+bundle install --path vendor/bundle
+
+bundle exec rake assets:precompile
+
+bundle exec puma -p 8600
+
+nginx.conf:
+server {
+    listen 9000;
+    server_name localhost;
+    root /path/predoc/public;
+    location / {
+        proxy_pass http://127.0.0.1:8600;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $http_host;
+        #proxy_set_header X-Forwarded-Proto https;
+        proxy_redirect default;
+        proxy_buffer_size       32k;
+        proxy_buffers           32 256k;
+        proxy_busy_buffers_size 512k;
+        proxy_temp_file_write_size 512k;
+    }
+}
