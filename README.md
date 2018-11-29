@@ -70,13 +70,15 @@ To run unit tests, first create `test.rb` from the template file `config/test.rb
 Note
 -------
 
-bundle install --path vendor/bundle
+    bundle install --path vendor/bundle
 
-bundle exec rake assets:precompile
+    bundle exec rake assets:precompile
 
-bundle exec puma -p 8600
+    bundle exec puma -p 8600
 
 nginx.conf:
+
+```
 server {
     listen 9000;
     server_name localhost;
@@ -94,3 +96,4 @@ server {
         proxy_temp_file_write_size 512k;
     }
 }
+```
