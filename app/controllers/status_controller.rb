@@ -12,7 +12,7 @@ class StatusController < ApplicationController
     status_text = status.all? { |key, status| status } ? 'OK' : 'PROBLEM'
     status_json = {status: status_text}.merge(status)
     respond_to do |format|
-      format.all { render inline: status_text }
+      format.all { render plain: status_text, content_type: 'text/plain' }
       format.json { render json: status_json }
     end
   end
