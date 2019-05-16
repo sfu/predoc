@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class DocumentsControllerTest < ActionController::TestCase
+class DocumentsControllerTest < ActionDispatch::IntegrationTest
 
   def assert_pdf_sent
     assert_response :success
@@ -11,16 +11,16 @@ class DocumentsControllerTest < ActionController::TestCase
   # TEST ROUTE/PARAMETER HANDLING
   ###
 
-  test 'should handle missing parameters' do
-    get :convert
+  def test_handle_missing_params
+    get convert_url
     assert_response :success
     assert_template(:error)
     assert_nil assigns(:source)
   end
 
-  test 'should assign the source parameter properly' do
+  def test_assign_source_param
     source = 'just a test'
-    get :convert, url: source
+    get convert_url, params: { url: source }
     assert_equal(assigns(:source), source)
   end
 
@@ -28,33 +28,33 @@ class DocumentsControllerTest < ActionController::TestCase
   # TEST CONVERSION OF OFFICE DOCUMENTS
   ###
 
-  test 'should convert a Word document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:doc]
+  def test_convert_doc
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:doc] }
     assert_pdf_sent
   end
 
-  test 'should convert an Excel document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:xls]
+  def test_convert_xls
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:xls] }
     assert_pdf_sent
   end
 
-  test 'should convert a PowerPoint document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:ppt]
+  def test_convert_ppt
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:ppt] }
     assert_pdf_sent
   end
 
-  test 'should convert an OOXML Word document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:docx]
+  def test_convert_docx
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:docx] }
     assert_pdf_sent
   end
 
-  test 'should convert an OOXML Excel document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:xlsx]
+  def test_convert_xlsx
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:xlsx] }
     assert_pdf_sent
   end
 
-  test 'should convert an OOXML PowerPoint document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:pptx]
+  def test_convert_pptx
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:pptx] }
     assert_pdf_sent
   end
 
@@ -62,31 +62,31 @@ class DocumentsControllerTest < ActionController::TestCase
   # TEST CONVERSION OF OTHER DOCUMENTS
   ###
 
-  test 'should convert a plain text document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:txt]
+  def test_convert_txt
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:txt] }
     assert_pdf_sent
   end
 
-  test 'should convert a rich text document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:rtf]
+  def test_convert_rtf
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:rtf] }
     assert_pdf_sent
   end
 
-  test 'should convert an HTML document' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:html]
+  def test_convert_html
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:html] }
     assert_pdf_sent
   end
 
   # TODO: test images (e.g. PNG, GIF, JPEG)
 
-  test 'should skip a video file' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:mp4]
+  def test_convert_video
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:mp4] }
     assert_response :success
     assert_template(:error)
   end
 
-  test 'should handle a non-existent file' do
-    get :convert, url: Predoc::TestConfig::FIXTURE_URLS[:fake]
+  def test_convert_fake_file
+    get convert_url, params: { url: Predoc::TestConfig::FIXTURE_URLS[:fake] }
     assert_response :success
     assert_template(:error)
   end

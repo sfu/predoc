@@ -63,6 +63,9 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # ---
 
+# Use extra helper methods for testing
+gem 'rails-controller-testing', group: :test
+
 # Use jQuery to augment JavaScript
 gem 'jquery-rails'
 
