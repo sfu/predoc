@@ -1,7 +1,12 @@
 # Be sure to restart your server when you modify this file.
 
-# Your secret key for verifying the integrity of signed cookies.
+# Your secret key is used for verifying the integrity of signed cookies.
 # If you change this key, all old signed cookies will become invalid!
+
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-Predoc::Application.config.secret_token = 'e9aecc45c9d0e0faa1742117e92f9d10df66e79627453de5c23a5fcf728f1e404ae11d1e14439ddd72e5a8fc4fd627ca4f1091f1993bec51666cb00a2ede54e3'
+# You can use `rake secret` to generate a secure secret key.
+
+# Make sure your secret_key_base is kept private
+# if you're sharing your code publicly.
+Predoc::Application.config.secret_key_base = '841131260e21ee947fbf7257871c0161048cbd159b7b3263b8924113a11ba21ae7714a1db80b1da52528eb6141b62daf799bb03e39cf41ff00ee52b4de766a61'

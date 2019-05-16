@@ -1,8 +1,3 @@
 # Be sure to restart your server when you modify this file.
 
-Predoc::Application.config.session_store :cookie_store, key: '_Predoc_session'
-
-# Use the database for sessions instead of the cookie-based default,
-# which shouldn't be used to store highly confidential information
-# (create the session table with "rails generate session_migration")
-# Predoc::Application.config.session_store :active_record_store
+Predoc::Application.config.session_store :cookie_store, key: '_predoc_session'
