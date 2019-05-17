@@ -49,6 +49,8 @@ Deployment
 
 You can use Capistrano to deploy Predoc. Create `deploy.rb` from the template file `config/deploy.rb.example` at the same location. Customize settings as needed. You have the option to deploy to multiple stages (e.g. staging, production, etc.) In that case, you'll need to create `config/deploy/{stage_name}.rb` as well.
 
+In production, the application expects the environment variable `SECRET_KEY_BASE` to be set. Generate one using `rake secret`, then `export` the output within a shell configuration script like `.bashrc` or `.profile` for the user running the application.
+
 Usage
 -----
 
