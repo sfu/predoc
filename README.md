@@ -60,6 +60,10 @@ To create a preview, point your web browser to the web service:
 
 *Note: Replace `example.com` with the server hostname, and `http://path/to/document` with an actual web-hosted document*
 
+### Health Check
+
+The application status page is located at `http://example.com/status`. Use `/status.json` to get the output in JSON.
+
 Testing
 -------
 
