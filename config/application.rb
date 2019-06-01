@@ -26,5 +26,9 @@ module Predoc
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
+
+    # Override SAMEORIGIN default in Rails to allow application to be embedded
+    # outside of the domain.
+    config.action_dispatch.default_headers['X-Frame-Options'] = nil
   end
 end
