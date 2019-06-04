@@ -3,6 +3,11 @@
 All notable changes to Predoc will be documented in this file. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.1.1] - 2019-05-31
+
+### Changed
+- Allow app to be embedded outside of the domain
+
 ## [1.1] - 2019-05-22
 
 NOTE: This release requires `SECRET_KEY_BASE` to be set in the production environment.
