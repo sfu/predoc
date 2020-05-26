@@ -76,4 +76,4 @@ gem 'SyslogLogger', '~> 2.0'
 gem 'statsd-ruby', '~> 1.4.0'
 
 # Docsplit for converting documents into PDFs
-gem 'docsplit', '~> 0.7.2'
+gem 'docsplit', '~> 0.7.6'
