@@ -73,7 +73,7 @@ gem 'jquery-rails'
 gem 'SyslogLogger', '~> 2.0'
 
 # Statsd client for sending stats for aggregation
-gem 'statsd-ruby', '~> 1.2.1'
+gem 'statsd-ruby', '~> 1.4.0'
 
 # Docsplit for converting documents into PDFs
 gem 'docsplit', '~> 0.7.2'
