@@ -73,6 +73,7 @@ NOTE: This release requires `SECRET_KEY_BASE` to be set in the production enviro
 
 Initial release of Predoc!
 
+[1.2]: https://github.com/sfu/predoc/releases/tag/v1.2
 [1.1.1]: https://github.com/sfu/predoc/releases/tag/v1.1.1
 [1.1]: https://github.com/sfu/predoc/releases/tag/v1.1
 [1.0.8]: https://github.com/sfu/predoc/releases/tag/v1.0.8
